@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Manager Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">📡 WiFi Manager</div>
+            <button class="close-btn" onclick="toggleSidebar()">✕</button>
+        </div>
+        <div class="nav-menu">
+            <a href="#" class="nav-link active" onclick="showPage('dashboard')">📊 Dashboard</a>
+            <a href="#" class="nav-link" onclick="showPage('pelanggan')">👥 Data Pelanggan</a>
+            <a href="#" class="nav-link" onclick="showPage('pembayaran')"> Pembayaran</a>
+            <a href="#" class="nav-link" onclick="showPage('pengeluaran')">📤 Pengeluaran</a>
+            <a href="#" class="nav-link" onclick="showPage('keuangan')">💼 Laporan Keuangan</a>
+            <a href="#" class="nav-link" onclick="showPage('riwayat')">📜 Riwayat Transaksi</a>
+        </div>
+        <div class="sync-status" id="syncStatus">
+            <span class="dot" id="syncDot"></span>
+            <span id="syncText">Online</span>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <h1 id="pageTitle">Dashboard</h1>
+            <div class="topbar-right">
+                <button class="print-btn" onclick="printPage()">🖨️ Print</button>
+            </div>
+        </header>
+
+        <!-- PAGES -->
+        <div class="pages">
+            <!-- ==================== DASHBOARD ==================== -->
+            <div class="page active" id="page-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Total Pelanggan</h3>
+                            <p id="totalPelanggan">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>Pemasukan Bulan Ini</h3>
+                            <p id="pemasukanBulanIni">Rp 0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Pengeluaran Bulan Ini</h3>
+                            <p id="pengeluaranBulanIni">Rp 0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon">💵</div>
+                        <div class="stat-info">
+                            <h3>Saldo</h3>
+                            <p id="saldoTotal">Rp 0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <h3>Tunggakan</h3>
+                            <p id="totalTunggakan">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h2>📅 Pelanggan Jatuh Tempo Bulan Ini</h2>
+                        <div id="jatuhTempoList" class="list-container"></div>
+                    </div>
+                    <div class="card">
+                        <h2>📊 Pembayaran Terakhir</h2>
+                        <div id="pembayaranTerakhir" class="list-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== DATA PELANGGAN ==================== -->
+            <div class="page" id="page-pelanggan">
+                <div class="page-header">
+                    <h2>Data Pelanggan</h2>
+                    <button class="btn-primary" onclick="showModal('modalTambahPelanggan')">+ Tambah Pelanggan</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="searchPelanggan" placeholder="🔍 Cari pelanggan..." oninput="filterPelanggan()">
+                </div>
+                <div class="table-container">
+                    <table id="tabelPelanggan">
+                        <thead>
+                            <tr>
+                                <th>No. KTL</th>
+                                <th>Nama</th>
+                                <th>No. HP</th>
+                                <th>Alamat</th>
+                                <th>Paket</th>
+                                <th>Perangkat</th>
+                                <th>Tgl Daftar</th>
+                                <th>Tunggakan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPelanggan"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== PEMBAYARAN ==================== -->
+            <div class="page" id="page-pembayaran">
+                <div class="page-header">
+                    <h2>Pembayaran Bulanan</h2>
+                </div>
+                <div class="filter-bar">
+                    <select id="filterBulanBayar" onchange="renderPembayaran()">
+                        <option value="0">Januari</option>
+                        <option value="1">Februari</option>
+                        <option value="2">Maret</option>
+                        <option value="3">April</option>
+                        <option value="4">Mei</option>
+                        <option value="5">Juni</option>
+                        <option value="6">Juli</option>
+                        <option value="7">Agustus</option>
+                        <option value="8">September</option>
+                        <option value="9">Oktober</option>
+                        <option value="10">November</option>
+                        <option value="11">Desember</option>
+                    </select>
+                    <select id="filterTahunBayar" onchange="renderPembayaran()">
+                    </select>
+                    <select id="filterPaketBayar" onchange="renderPembayaran()">
+                        <option value="">Semua Paket</option>
+                        <option value="40000">40.000</option>
+                        <option value="60000">60.000</option>
+                        <option value="70000">70.000</option>
+                        <option value="150000">150.000</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table id="tabelPembayaran">
+                        <thead>
+                            <tr>
+                                <th>No. KTL</th>
+                                <th>Nama</th>
+                                <th>Paket</th>
+                                <th>Status</th>
+                                <th>Tgl Bayar</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPembayaran"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== PENGELUARAN ==================== -->
+            <div class="page" id="page-pengeluaran">
+                <div class="page-header">
+                    <h2>Pengeluaran Operasional</h2>
+                    <button class="btn-primary" onclick="showModal('modalTambahPengeluaran')">+ Tambah Pengeluaran</button>
+                </div>
+                <div class="filter-bar">
+                    <input type="month" id="filterBulanPengeluaran" onchange="renderPengeluaran()">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Keterangan</th>
+                                <th>Jumlah</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPengeluaran"></tbody>
+                        <tfoot>
+                            <tr class="table-total">
+                                <td colspan="2"><strong>Total Pengeluaran</strong></td>
+                                <td><strong id="totalPengeluaranList">Rp 0</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== LAPORAN KEUANGAN ==================== -->
+            <div class="page" id="page-keuangan">
+                <div class="page-header">
+                    <h2>Laporan Keuangan</h2>
+                </div>
+                <div class="filter-bar">
+                    <input type="month" id="filterBulanKeuangan" onchange="renderKeuangan()">
+                </div>
+                <div class="keuangan-grid">
+                    <div class="card keuangan-card green">
+                        <h3>💰 Total Pemasukan</h3>
+                        <p id="laporanPemasukan">Rp 0</p>
+                    </div>
+                    <div class="card keuangan-card red">
+                        <h3>📤 Total Pengeluaran</h3>
+                        <p id="laporanPengeluaran">Rp 0</p>
+                    </div>
+                    <div class="card keuangan-card blue">
+                        <h3>💵 Saldo Bersih</h3>
+                        <p id="laporanSaldo">Rp 0</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Detail Transaksi</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Tipe</th>
+                                    <th>Keterangan</th>
+                                    <th>Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyLaporanKeuangan"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== RIWAYAT TRANSAKSI ==================== -->
+            <div class="page" id="page-riwayat">
+                <div class="page-header">
+                    <h2>Riwayat Transaksi</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal & Waktu</th>
+                                <th>Tipe</th>
+                                <th>Keterangan</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyRiwayat"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL TAMBAH PELANGGAN ==================== -->
+    <div class="modal-overlay" id="modalTambahPelanggan">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>👤 Tambah Pelanggan Baru</h2>
+                <button class="close-modal" onclick="hideModal('modalTambahPelanggan')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nomor KTL</label>
+                        <input type="text" id="nomorKTL" placeholder="01-T">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Pelanggan</label>
+                        <input type="text" id="namaPelanggan" placeholder="Nama lengkap">
+                    </div>
+                    <div class="form-group">
+                        <label>No. HP</label>
+                        <input type="tel" id="nomorHP" placeholder="08xxxxxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <input type="text" id="alamatPelanggan" placeholder="Alamat lengkap">
+                    </div>
+                    <div class="form-group">
+                        <label>Pilih Paket</label>
+                        <select id="paketPelanggan">
+                            <option value="40000">40.000 / bulan</option>
+                            <option value="60000">60.000 / bulan</option>
+                            <option value="70000">70.000 / bulan</option>
+                            <option value="150000">150.000 / bulan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah Perangkat</label>
+                        <input type="number" id="jumlahDevice" placeholder="Jumlah HP/device" min="1" max="10" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Daftar</label>
+                        <input type="date" id="tglDaftar">
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Jatuh Tempo</label>
+                        <input type="date" id="tglJatuhTempo">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="hideModal('modalTambahPelanggan')">Batal</button>
+                <button class="btn-primary" onclick="simpanPelanggan()">💾 Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL EDIT PELANGGAN ==================== -->
+    <div class="modal-overlay" id="modalEditPelanggan">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>✏️ Edit Pelanggan</h2>
+                <button class="close-modal" onclick="hideModal('modalEditPelanggan')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editPelangganId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nomor KTL</label>
+                        <input type="text" id="editNomorKTL">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Pelanggan</label>
+                        <input type="text" id="editNamaPelanggan">
+                    </div>
+                    <div class="form-group">
+                        <label>No. HP</label>
+                        <input type="tel" id="editNomorHP">
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <input type="text" id="editAlamatPelanggan">
+                    </div>
+                    <div class="form-group">
+                        <label>Pilih Paket</label>
+                        <select id="editPaketPelanggan">
+                            <option value="40000">40.000 / bulan</option>
+                            <option value="60000">60.000 / bulan</option>
+                            <option value="70000">70.000 / bulan</option>
+                            <option value="150000">150.000 / bulan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah Perangkat</label>
+                        <input type="number" id="editJumlahDevice" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Daftar</label>
+                        <input type="date" id="editTglDaftar">
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Jatuh Tempo</label>
+                        <input type="date" id="editTglJatuhTempo">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="hideModal('modalEditPelanggan')">Batal</button>
+                <button class="btn-primary" onclick="updatePelanggan()">💾 Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL BAYAR ==================== -->
+    <div class="modal-overlay" id="modalBayar">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>💰 Proses Pembayaran</h2>
+                <button class="close-modal" onclick="hideModal('modalBayar')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="bayarPelangganId">
+                <input type="hidden" id="bayarBulan">
+                <input type="hidden" id="bayarTahun">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Pelanggan</label>
+                        <input type="text" id="bayarNama" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Paket</label>
+                        <input type="text" id="bayarPaket" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Bulan/Tahun</label>
+                        <input type="text" id="bayarBulanTahun" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Bayar</label>
+                        <input type="date" id="bayarTanggal">
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah Bayar</label>
+                        <input type="number" id="bayarJumlah" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="hideModal('modalBayar')">Batal</button>
+                <button class="btn-primary" onclick="prosesBayar()">✅ Proses Pembayaran</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DETAIL PELANGGAN ==================== -->
+    <div class="modal-overlay" id="modalDetailPelanggan">
+        <div class="modal modal-large">
+            <div class="modal-header">
+                <h2>📋 Detail & Riwayat Pembayaran</h2>
+                <button class="close-modal" onclick="hideModal('modalDetailPelanggan')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="detailPelangganInfo" class="detail-info"></div>
+                <h3>📅 Pembayaran 12 Bulan</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Status</th>
+                                <th>Tgl Bayar</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDetailBayar"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL TAMBAH PENGELUARAN ==================== -->
+    <div class="modal-overlay" id="modalTambahPengeluaran">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>📤 Tambah Pengeluaran</h2>
+                <button class="close-modal" onclick="hideModal('modalTambahPengeluaran')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tanggal</label>
+                        <input type="date" id="pengeluaranTanggal">
+                    </div>
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <input type="text" id="pengeluaranKeterangan" placeholder="Keterangan pengeluaran">
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah (Rp)</label>
+                        <input type="number" id="pengeluaranJumlah" placeholder="0">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="hideModal('modalTambahPengeluaran')">Batal</button>
+                <button class="btn-primary" onclick="simpanPengeluaran()">💾 Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PRINT AREA (HIDDEN) ==================== -->
+    <div id="printArea" style="display:none;"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
