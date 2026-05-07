@@ -761,3 +761,25 @@ tbody tr:hover {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+/* Pastikan sidebar menggunakan flexbox agar footer bisa di-push ke bawah */
+.sidebar {
+    display: flex; /* Tambahkan ini */
+    flex-direction: column; /* Tambahkan ini */
+}
+
+/* Style untuk Footer Copyright */
+.sidebar-footer {
+    margin-top: auto; /* Mendorong footer ke paling bawah */
+    padding: 15px 10px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5); /* Warna putih transparan */
+    font-size: 11px;
+    font-weight: 400;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-footer p {
+    margin: 0;
+    line-height: 1.4;
+}
